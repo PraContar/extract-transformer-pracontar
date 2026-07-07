@@ -1,0 +1,258 @@
+/* ==========================================================================
+   Branding PraContar Contabilidade Digital
+   Cor da marca: #624493 (roxo). Fontes: Poppins (marca/títulos) + Inter (corpo).
+   ========================================================================== */
+
+:root {
+  /* Tema claro (padrão) */
+  --bg: #f5f3fa;
+  --card: #ffffff;
+  --border: #e7e1f1;
+  --text: #241d35;
+  --muted: #6b6480;
+  --accent: #624493; /* roxo da marca */
+  --accent-strong: #4e3475;
+  --accent-soft: rgba(98, 68, 147, 0.08);
+  --ok: #2e9e76;
+  --ok-soft: rgba(46, 158, 118, 0.12);
+  --warn: #b4790c;
+  --warn-soft: rgba(180, 121, 12, 0.13);
+  --logo: #624493; /* cor da logo (máscara) no tema claro */
+  --shadow: 0 12px 32px rgba(56, 34, 92, 0.1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151122;
+    --card: #1e1930;
+    --border: #322a47;
+    --text: #ece8f5;
+    --muted: #a79ebb;
+    --accent: #9a7bd4; /* roxo clareado p/ contraste no escuro */
+    --accent-strong: #8563c0;
+    --accent-soft: rgba(154, 123, 212, 0.12);
+    --ok: #35d08d;
+    --ok-soft: rgba(53, 208, 141, 0.12);
+    --warn: #fbbf24;
+    --warn-soft: rgba(251, 191, 36, 0.12);
+    --logo: #baa4e2; /* lilás claro p/ a logo ler no escuro */
+    --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho / marca */
+.hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.brand-logo {
+  width: 232px;
+  max-width: 68vw;
+  aspect-ratio: 720 / 107;
+  margin: 0 auto 20px;
+  background-color: var(--logo);
+  -webkit-mask: url(/pracontar-logo.png) no-repeat center / contain;
+  mask: url(/pracontar-logo.png) no-repeat center / contain;
+}
+.hero h1 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+/* Dropzone */
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.dropzone:hover,
+.dropzone.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.dz-icon {
+  font-size: 2.6rem;
+}
+.dz-title {
+  margin: 12px 0 4px;
+  font-weight: 600;
+}
+.dz-sub {
+  margin: 0;
+  color: var(--muted);
+}
+.dz-note {
+  margin: 18px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Progresso */
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+.pct {
+  font-family: 'Inter', sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.bar {
+  height: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  transition: width 0.2s ease;
+}
+.progress .btn {
+  margin-top: 20px;
+}
+
+/* Resultado */
+.result,
+.error {
+  text-align: center;
+}
+.result-icon {
+  font-size: 2.6rem;
+}
+.result h2,
+.error h2 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-weight: 600;
+  margin: 8px 0 20px;
+}
+.stats {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.stats li {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stats strong {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+}
+.stats span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.err-msg {
+  color: var(--warn);
+  word-break: break-word;
+}
+
+.recon {
+  margin: 0 0 22px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+.recon.ok {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+.recon.warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+/* Botões */
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.btn {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 11px 20px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn.primary:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--text);
+}
+.btn.ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.foot {
+  margin-top: auto;
+  padding-top: 28px;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
