@@ -175,8 +175,14 @@ body {
   padding: 0;
   margin: 0 0 24px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* Nº de tiles varia com o layout detectado (3 ou 4). */
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 12px;
+}
+.layout-tag {
+  margin: -12px 0 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 .stats li {
   background: var(--bg);

@@ -1,7 +1,8 @@
 /// <reference lib="webworker" />
 import * as pdfjsLib from 'pdfjs-dist';
 import PdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
-import { assembleRows, clusterPageLines } from '../core/extractRows';
+import { clusterPageLines } from '../core/grid';
+import { extractTable } from '../core/layouts';
 import { buildWorkbook } from '../core/buildXlsx';
 import type { ConvertRequest, PageLines, WorkerOut } from '../types';
 
@@ -35,8 +36,8 @@ ctx.onmessage = async (e: MessageEvent<ConvertRequest>) => {
       post({ type: 'progress', page: p, total });
     }
 
-    const rows = assembleRows(pages);
-    const { xlsx, stats } = buildWorkbook(rows, total);
+    const table = extractTable(pages);
+    const { xlsx, stats } = buildWorkbook(table, total);
     post({ type: 'done', xlsx, stats, fileName }, [xlsx]);
   } catch (err) {
     post({ type: 'error', message: err instanceof Error ? err.message : String(err) });

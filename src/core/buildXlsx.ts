@@ -1,21 +1,5 @@
 import * as XLSX from 'xlsx';
-import type { ConversionStats, TransactionRow } from '../types';
-import { reconcile } from './validate.ts';
-
-const HEADERS = [
-  'Descrição',
-  'Valor',
-  'Saldo na conta',
-  'Tipo',
-  'Debitado',
-  'Creditado',
-  'Referência',
-  'Data/Hora',
-];
-
-/** Formato da coluna Data/Hora, idêntico à planilha-modelo (o valor mantém os segundos). */
-const DATE_FMT = 'm/d/yy h:mm';
-const DATA_HORA_COL = 7; // índice 0-based
+import type { CellValue, ConversionStats, ExtractedTable } from '../types';
 
 // Serial do Excel calculado via UTC, tratando os componentes locais como "wall clock".
 // Evita o bug do SheetJS em fusos com offset histórico não-inteiro (ex.: Brasil pré-1914,
@@ -35,29 +19,33 @@ function toExcelSerial(d: Date): number {
 }
 
 /**
- * Monta a planilha final (SheetJS) a partir dos registros. Saldo sai como número
- * (formato General) e Data/Hora como data tipada com o formato do modelo. Devolve
- * o ArrayBuffer + estatísticas (incluindo a reconciliação de saldo).
+ * Monta a planilha final (SheetJS) a partir da tabela extraída — qualquer que
+ * seja o layout de origem. Valores numéricos saem como número (formato General)
+ * e datas como data tipada com o formato do layout. Devolve o ArrayBuffer +
+ * estatísticas (incluindo a reconciliação).
  */
 export function buildWorkbook(
-  rows: TransactionRow[],
+  table: ExtractedTable,
   pageCount: number,
 ): { xlsx: ArrayBuffer; stats: ConversionStats } {
   const wb = XLSX.utils.book_new();
 
-  // Data/Hora fica como null aqui; é preenchida como serial numérico abaixo.
-  const aoa: (string | number | null)[][] = [HEADERS];
-  for (const r of rows) {
-    aoa.push([r.descricao, r.valor, r.saldo, r.tipo, r.debitado, r.creditado, r.referencia, null]);
+  // Datas ficam como null aqui; são preenchidas como serial numérico abaixo.
+  const aoa: (string | number | null)[][] = [table.headers];
+  for (const row of table.rows) {
+    aoa.push(row.map((v) => (v instanceof Date ? null : (v as string | number | null))));
   }
   const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-  // Coluna Data/Hora: serial do Excel + formato do modelo (data tipada, sem drift de fuso).
-  for (let i = 0; i < rows.length; i++) {
-    const d = rows[i].dataHora;
-    if (!d) continue;
-    const addr = XLSX.utils.encode_cell({ r: i + 1, c: DATA_HORA_COL });
-    ws[addr] = { t: 'n', v: toExcelSerial(d), z: DATE_FMT };
+  // Colunas de data: serial do Excel + formato do layout (sem drift de fuso).
+  for (const [key, fmt] of Object.entries(table.dateFormats)) {
+    const c = Number(key);
+    table.rows.forEach((row: CellValue[], i) => {
+      const v = row[c];
+      if (!(v instanceof Date)) return;
+      const addr = XLSX.utils.encode_cell({ r: i + 1, c });
+      ws[addr] = { t: 'n', v: toExcelSerial(v), z: fmt };
+    });
   }
 
   // Nome da aba no padrão do modelo: "Table001 (Page 1-N)".
@@ -67,10 +55,11 @@ export function buildWorkbook(
 
   const stats: ConversionStats = {
     pages: pageCount,
-    totalRows: rows.length,
-    creditos: rows.filter((r) => /cr[ée]dito/i.test(r.tipo)).length,
-    debitos: rows.filter((r) => /d[ée]bito/i.test(r.tipo)).length,
-    reconciliation: reconcile(rows),
+    totalRows: table.rows.length,
+    layout: table.layout,
+    layoutLabel: table.label,
+    highlights: table.highlights,
+    reconciliation: table.reconciliation,
   };
 
   return { xlsx, stats };

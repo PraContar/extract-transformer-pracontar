@@ -34,19 +34,18 @@ export function ResultPanel({
     <div className="result">
       <div className="result-icon">✅</div>
       <h2>Conversão concluída</h2>
+      <p className="layout-tag">Formato detectado: {stats.layoutLabel}</p>
       <ul className="stats">
         <li>
           <strong>{stats.totalRows.toLocaleString('pt-BR')}</strong>
           <span>linhas</span>
         </li>
-        <li>
-          <strong>{stats.creditos.toLocaleString('pt-BR')}</strong>
-          <span>créditos</span>
-        </li>
-        <li>
-          <strong>{stats.debitos.toLocaleString('pt-BR')}</strong>
-          <span>débitos</span>
-        </li>
+        {stats.highlights.map((h) => (
+          <li key={h.label}>
+            <strong>{h.value.toLocaleString('pt-BR')}</strong>
+            <span>{h.label}</span>
+          </li>
+        ))}
         <li>
           <strong>{stats.pages.toLocaleString('pt-BR')}</strong>
           <span>páginas</span>

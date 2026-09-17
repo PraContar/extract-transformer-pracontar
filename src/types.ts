@@ -34,7 +34,7 @@ export interface PageLines {
   lines: VisualLine[];
 }
 
-/** Registro canônico = 1 linha da planilha de saída (colunas A..H). */
+/** Registro do layout "Lançamentos" = 1 linha da planilha (colunas A..H). */
 export interface TransactionRow {
   descricao: string;
   valor: string;
@@ -44,6 +44,42 @@ export interface TransactionRow {
   creditado: string;
   referencia: string;
   dataHora: Date | null;
+}
+
+/** Registro do layout "Extrato Consolidado" = 1 linha da planilha (colunas A..F). */
+export interface DailySummaryRow {
+  /** Data do resumo; `null` na linha de TOTAIS. */
+  data: Date | null;
+  /** Rótulo exibido na coluna Data quando não há data (ex.: "TOTAIS"). */
+  rotulo: string;
+  saldoInicial: number | null;
+  entradas: number | null;
+  saidas: number | null;
+  saldoDia: number | null;
+  saldoFinal: number | null;
+}
+
+/** Layouts de relatório ModoBank reconhecidos pelo conversor. */
+export type LayoutId = 'lancamentos' | 'consolidado';
+
+/** Valor de célula já tipado para a planilha. */
+export type CellValue = string | number | Date | null;
+
+/**
+ * Tabela pronta para virar planilha — saída comum a todos os layouts, para que
+ * `buildXlsx` e a UI não precisem conhecer o formato de origem.
+ */
+export interface ExtractedTable {
+  layout: LayoutId;
+  /** Nome do layout exibido na UI (ex.: "Extrato Consolidado"). */
+  label: string;
+  headers: string[];
+  rows: CellValue[][];
+  /** Colunas de data (índice 0-based) e o formato Excel aplicado a elas. */
+  dateFormats: Record<number, string>;
+  reconciliation: Reconciliation;
+  /** Métricas extras exibidas no painel de resultado. */
+  highlights: { label: string; value: number }[];
 }
 
 /** Uma divergência encontrada na reconciliação do saldo corrente. */
@@ -66,8 +102,11 @@ export interface Reconciliation {
 export interface ConversionStats {
   pages: number;
   totalRows: number;
-  creditos: number;
-  debitos: number;
+  /** Layout detectado no PDF de entrada. */
+  layout: LayoutId;
+  layoutLabel: string;
+  /** Contagens específicas do layout (créditos/débitos, dias, ...). */
+  highlights: { label: string; value: number }[];
   reconciliation: Reconciliation;
 }
 
